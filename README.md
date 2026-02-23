@@ -5,7 +5,9 @@ git clone https://github.com/Gino2525/Campus-Assignment-Management-API.git
 cd Campus-Assignment-Management-API
 
 pip install -r requirements.txt
+
 python manage.py migrate
+
 python manage.py runserver
 
 Then open http://127.0.0.1:8080 in your browser.
