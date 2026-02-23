@@ -1,6 +1,6 @@
 This project is a Django REST API for managing student assignments. Students can register, login, view, add, update, and delete their assignments.  
 1. Clone the repository
-2. 
+
 git clone https://github.com/Gino2525/Campus-Assignment-Management-API.git
 cd Campus-Assignment-Management-API
 
