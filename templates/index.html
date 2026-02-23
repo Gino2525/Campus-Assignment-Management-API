@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Portal</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #4e73df, #1cc88a);
+            min-height: 100vh;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+       
+        .card {
+            background: white;
+            padding: 30px;
+            width: 350px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            margin: 100px auto;
+            text-align: center;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            font-size: 14px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #4e73df;
+        }
+
+        button {
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .btn-primary {
+            background: #4e73df;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2e59d9;
+        }
+
+        .btn-danger {
+            background: #e74a3b;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-success {
+            background: #1cc88a;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #17a673;
+        }
+
+        /* DASHBOARD */
+        #assignmentsSection {
+            padding: 40px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .assignments-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .assignment {
+            background: white;
+            padding: 20px;
+            width: 300px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .assignment h3 {
+            margin-bottom: 10px;
+        }
+
+        .assignment input {
+            margin-bottom: 6px;
+        }
+
+        .add-box {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            max-width: 400px;
+        }
+
+        #error {
+            color: red;
+            margin-top: 10px;
+        }
+        select {
+        width: 100%;
+        padding: 10px;
+        margin: 8px 0;
+        border-radius: 6px;
+        border: 1px solid #ddd;
+        font-size: 14px;
+    }
+
+    </style>
+</head>
+
+<body>
+
+
+<div class="card" id="loginCard">
+    <h2>Student Login</h2>
+    <input type="text" id="username" placeholder="Username">
+    <input type="password" id="password" placeholder="Password">
+    <button class="btn-primary" onclick="login()">Login</button>
+    <p id="error"></p>
+    <p style="margin-top:15px;">
+        Don't have an account?
+        <button onclick="showRegister()" style="background:none;border:none;color:#4e73df;cursor:pointer;">
+            Register
+        </button>
+    </p>
+</div>
+
+<div class="card" id="registerCard" style="display:none;">
+    <h2>Student Registration</h2>
+
+    <input type="text" id="regUsername" placeholder="Username">
+    <input type="text" id="regName" placeholder="Full Name">
+    <input type="email" id="regEmail" placeholder="Email">
+    <input type="password" id="regPassword" placeholder="Password">
+    <select id="regDepartment">
+        <option value="">Select Department</option>
+        <option value="CSE">Computer Science</option>
+        <option value="ECE">Electronics</option>
+        <option value="ME">Mechanical</option>
+        <option value="CE">Civil</option>
+    </select>
+    
+    <select id="regYear">
+        <option value="">Select Year</option>
+        <option value="1">1st Year</option>
+        <option value="2">2nd Year</option>
+        <option value="3">3rd Year</option>
+        <option value="4">4th Year</option>
+    </select>
+
+    <button class="btn-success" onclick="register()">Register</button>
+
+    <p style="margin-top:15px;">
+        Already have an account?
+        <button onclick="showLogin()" style="background:none;border:none;color:#4e73df;cursor:pointer;">
+            Login
+        </button>
+    </p>
+</div>
+
+
+<div id="assignmentsSection" style="display:none;">
+    
+    <div class="header">
+        <h2>My Assignments</h2>
+        <button class="btn-danger" onclick="logout()">Logout</button>
+    </div>
+
+    <div class="add-box">
+        <h3>Add Assignment</h3>
+        <input id="newTitle" placeholder="Title">
+        <input id="newSubject" placeholder="Subject">   
+        <input id="newDesc" placeholder="Description">
+        
+        <select id="newStatus">
+            <option value="Pending">Pending</option>
+            <option value="Submitted">Submitted</option>
+            <option value="Approved">Approved</option>
+        </select>
+        <button class="btn-success" onclick="addAssignment()">Add</button>
+    </div>
+
+    <div class="assignments-container" id="assignmentsList"></div>
+
+</div>
+
+<script>
+const BASE_URL = "http://127.0.0.1:8000";
+
+async function login() {
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+
+    const response = await fetch(`${BASE_URL}/login/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+        localStorage.setItem("token", data.access);
+        showAssignments();
+    } else {
+        document.getElementById("error").innerText = "Invalid credentials";
+    }
+}
+function showRegister() {
+    document.getElementById("loginCard").style.display = "none";
+    document.getElementById("registerCard").style.display = "block";
+}
+
+function showLogin() {
+    document.getElementById("registerCard").style.display = "none";
+    document.getElementById("loginCard").style.display = "block";
+}
+async function register() {
+    const username = document.getElementById("regUsername").value;
+    const name = document.getElementById("regName").value;
+    const email = document.getElementById("regEmail").value;
+    const password = document.getElementById("regPassword").value;
+    const department = parseInt(document.getElementById("regDepartment").value);
+    const year = parseInt(document.getElementById("regYear").value);
+
+    const response = await fetch(`${BASE_URL}/register/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            username,
+            name,
+            email,
+            password,
+            department,
+            year
+        })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+        alert("Registration successful! Please login.");
+        showLogin();
+    } else {
+        const message = Object.values(data)[0][0];
+        alert(message);
+    }
+}
+async function showAssignments() {
+    document.getElementById("loginCard").style.display = "none";
+    document.getElementById("assignmentsSection").style.display = "block";
+
+    const token = localStorage.getItem("token");
+
+    const response = await fetch(`${BASE_URL}/assignments/`, {
+        headers: { "Authorization": `Bearer ${token}` }
+    });
+
+    const assignments = await response.json();
+    const listDiv = document.getElementById("assignmentsList");
+    listDiv.innerHTML = "";
+
+    assignments.forEach(a => {
+        const isUpdated = a.updated_at && a.updated_at !== a.created_at;
+
+        const displayDate = isUpdated ? a.updated_at : a.created_at;
+
+        const formattedDate =
+            new Date(displayDate).toLocaleDateString() +
+            " " +
+            new Date(displayDate).toLocaleTimeString();
+
+        const label = isUpdated ? "Updated" : "Created";
+    listDiv.innerHTML += `
+        <div class="assignment">
+            <small style="color:gray;">${label}: ${formattedDate}</small>
+
+            <input value="${a.title}" id="title-${a.id}">
+            <input value="${a.subject}" id="subject-${a.id}">
+            <input value="${a.description}" id="desc-${a.id}">
+
+            <select id="status-${a.id}">
+                <option value="Pending" ${a.status === "Pending" ? "selected" : ""}>Pending</option>
+                <option value="Submitted" ${a.status === "Submitted" ? "selected" : ""}>Submitted</option>
+                <option value="Approved" ${a.status === "Approved" ? "selected" : ""}>Approved</option>
+            </select>
+
+            <button class="btn-primary" onclick="updateAssignment(${a.id})">Update</button>
+            <button class="btn-danger" onclick="deleteAssignment(${a.id})">Delete</button>
+        </div>
+    `;
+    });
+}
+
+async function addAssignment() {
+    const token = localStorage.getItem("token");
+
+    const title = document.getElementById("newTitle").value;
+    const subject = document.getElementById("newSubject").value;
+    const description = document.getElementById("newDesc").value;
+    const status = document.getElementById("newStatus").value;
+
+    const response = await fetch(`${BASE_URL}/assignments/`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({ title, subject, description, status })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+        alert("Assignment created successfully!");
+
+        document.getElementById("newTitle").value = "";
+        document.getElementById("newSubject").value = "";
+        document.getElementById("newDesc").value = "";
+        document.getElementById("newStatus").value = "Pending";
+
+        showAssignments();
+    } else {
+        const message = Object.values(data)[0][0];
+        alert(message);
+    }
+}
+
+async function updateAssignment(id) {
+    const token = localStorage.getItem("token");
+
+    const title = document.getElementById(`title-${id}`).value;
+    const subject = document.getElementById(`subject-${id}`).value;
+    const description = document.getElementById(`desc-${id}`).value;
+    const status = document.getElementById(`status-${id}`).value;
+
+    await fetch(`${BASE_URL}/assignments/${id}/`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({ title, subject, description, status })
+    });
+
+    showAssignments();
+}
+async function deleteAssignment(id) {
+    const token = localStorage.getItem("token");
+
+    await fetch(`${BASE_URL}/assignments/${id}/`, {
+        method: "DELETE",
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    });
+
+    showAssignments();
+}
+
+function logout() {
+    localStorage.removeItem("token");
+    location.reload();
+}
+
+if (localStorage.getItem("token")) {
+    showAssignments();
+}
+</script>
+
+</body>
+</html>
