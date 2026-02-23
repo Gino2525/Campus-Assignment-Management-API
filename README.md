@@ -54,3 +54,24 @@ Click Delete on any assignment card to remove it.
 7. Logout  (Refresh token is stored locally for a better user experience.)
 
 Click Logout to return to the login page. 
+_____________________________________________________________________________________
+🔗 API Documentation
+Base URL: http://127.0.0.1:8000/
+
+👤 Authentication Endpoints
+Base URL: http://127.0.0.1:8000/
+
+POST/register/ -Register a new student
+POST,/login/  -Login and receive JWT tokens
+POST,/token/refresh/ -Refresh access token using refresh token
+
+GET	/departments/	-Get list of all departments (used in registration form select field)
+
+Assignment Endpoints
+
+Method,Endpoint,Description
+GET/assignments/-Get all assignments for logged-in student
+POST/assignments-Create a new assignment
+GET/assignments/<id>/-Retrieve a specific assignment
+PUT/assignments/<id>/-Update a specific assignment
+DELETE/assignments/<id>/-Delete a specific assignment
